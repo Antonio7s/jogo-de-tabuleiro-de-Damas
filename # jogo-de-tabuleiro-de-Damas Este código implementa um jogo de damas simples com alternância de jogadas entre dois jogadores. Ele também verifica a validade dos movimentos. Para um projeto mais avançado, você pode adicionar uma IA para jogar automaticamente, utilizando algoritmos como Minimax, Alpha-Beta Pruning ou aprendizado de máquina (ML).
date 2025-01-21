@@ -1,0 +1,82 @@
+# jogo-de-tabuleiro-de-Damas
+Este código implementa um jogo de damas simples com alternância de jogadas entre dois jogadores. Ele também verifica a validade dos movimentos. Para um projeto mais avançado, você pode adicionar uma IA para jogar automaticamente, utilizando algoritmos como Minimax, Alpha-Beta Pruning ou aprendizado de máquina (ML).
+
+#include <iostream>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+class Game {
+private:
+    vector<vector<char>> board;
+    bool currentPlayer;
+
+public:
+    Game() {
+        board = vector<vector<char>>(8, vector<char>(8, ' '));
+        currentPlayer = true;  // true for player 1, false for player 2
+        initBoard();
+    }
+
+    void initBoard() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (i < 3 && (i + j) % 2 != 0) board[i][j] = 'X'; // Player 1
+                if (i > 4 && (i + j) % 2 != 0) board[i][j] = 'O'; // Player 2
+            }
+        }
+    }
+
+    void printBoard() {
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                cout << board[i][j] << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    bool isValidMove(int x1, int y1, int x2, int y2) {
+        if (x2 < 0 || x2 >= 8 || y2 < 0 || y2 >= 8 || board[x2][y2] != ' ') return false;
+        if (abs(x2 - x1) == 1 && abs(y2 - y1) == 1) return true;
+        if (abs(x2 - x1) == 2 && abs(y2 - y1) == 2) {
+            int midX = (x1 + x2) / 2;
+            int midY = (y1 + y2) / 2;
+            return board[midX][midY] != ' ' && board[midX][midY] != (currentPlayer ? 'X' : 'O');
+        }
+        return false;
+    }
+
+    void makeMove(int x1, int y1, int x2, int y2) {
+        board[x2][y2] = board[x1][y1];
+        board[x1][y1] = ' ';
+        if (abs(x2 - x1) == 2 && abs(y2 - y1) == 2) {
+            int midX = (x1 + x2) / 2;
+            int midY = (y1 + y2) / 2;
+            board[midX][midY] = ' ';
+        }
+        currentPlayer = !currentPlayer;
+    }
+
+    void play() {
+        int x1, y1, x2, y2;
+        while (true) {
+            printBoard();
+            cout << "Player " << (currentPlayer ? "1 (X)" : "2 (O)") << ", enter move (x1 y1 x2 y2): ";
+            cin >> x1 >> y1 >> x2 >> y2;
+            if (isValidMove(x1, y1, x2, y2)) {
+                makeMove(x1, y1, x2, y2);
+            } else {
+                cout << "Invalid move, try again!" << endl;
+            }
+        }
+    }
+};
+
+int main() {
+    Game game;
+    game.play();
+    return 0;
+}
